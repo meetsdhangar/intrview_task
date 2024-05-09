@@ -543,11 +543,11 @@ class _HomeScreenState extends State<HomeScreen> {
                                                                   padding:
                                                                       const EdgeInsets
                                                                           .all(
-                                                                          5),
+                                                                          3),
                                                                   child: Text(
                                                                     "Country Detils",
                                                                     style: TextStyle(
-                                                                        fontSize: 15
+                                                                        fontSize: 12
                                                                             .sp,
                                                                         fontWeight:
                                                                             FontWeight
