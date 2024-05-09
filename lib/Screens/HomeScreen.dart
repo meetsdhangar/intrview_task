@@ -596,7 +596,25 @@ class CheckInternetConnectionWidget extends StatelessWidget {
         final state = snapshot.data!;
         switch (state) {
           case ConnectivityResult.none:
-            return Center(child: const Text('Not connected'));
+            return Center(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Container(
+                      height: 100.h,
+                      width: 150.w,
+                      child: Image.asset(
+                        "Assets/images/s1.png",
+                        fit: BoxFit.cover,
+                      )),
+                  const Text(
+                    'No Internet Connection',
+                    style: TextStyle(fontSize: 17),
+                  ),
+                ],
+              ),
+            );
           default:
             return widget;
         }

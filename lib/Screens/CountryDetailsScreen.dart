@@ -41,7 +41,7 @@ class CountryDetailsScreen extends StatelessWidget {
               ),
               Text("Discription :-",
                   style:
-                      TextStyle(fontSize: 20.sp, fontWeight: FontWeight.bold)),
+                      TextStyle(fontSize: 17.sp, fontWeight: FontWeight.bold)),
               Text(
                 contrylist.flags.alt.toString(),
                 style: TextStyle(fontSize: 17),
@@ -50,7 +50,7 @@ class CountryDetailsScreen extends StatelessWidget {
                 contentPadding: EdgeInsets.all(0),
                 leading: Text("Official :-",
                     style: TextStyle(
-                        fontSize: 20.sp, fontWeight: FontWeight.bold)),
+                        fontSize: 17.sp, fontWeight: FontWeight.bold)),
                 title: Text(
                   contrylist.name.official,
                 ),
@@ -59,56 +59,56 @@ class CountryDetailsScreen extends StatelessWidget {
                 contentPadding: EdgeInsets.all(0),
                 leading: Text("Independent :-",
                     style: TextStyle(
-                        fontSize: 20.sp, fontWeight: FontWeight.bold)),
+                        fontSize: 17.sp, fontWeight: FontWeight.bold)),
                 title: Text(contrylist.independent.toString()),
               ),
               ListTile(
                 contentPadding: EdgeInsets.all(0),
                 leading: Text("Status :-",
                     style: TextStyle(
-                        fontSize: 20.sp, fontWeight: FontWeight.bold)),
+                        fontSize: 17.sp, fontWeight: FontWeight.bold)),
                 title: Text(contrylist.status.toString()),
               ),
               ListTile(
                 contentPadding: EdgeInsets.all(0),
                 leading: Text("Member :-",
                     style: TextStyle(
-                        fontSize: 20.sp, fontWeight: FontWeight.bold)),
+                        fontSize: 17.sp, fontWeight: FontWeight.bold)),
                 title: Text(contrylist.unMember.toString()),
               ),
               ListTile(
                 contentPadding: EdgeInsets.all(0),
                 leading: Text("Population :-",
                     style: TextStyle(
-                        fontSize: 20.sp, fontWeight: FontWeight.bold)),
+                        fontSize: 17.sp, fontWeight: FontWeight.bold)),
                 title: Text(contrylist.population.toString()),
               ),
               ListTile(
                 contentPadding: EdgeInsets.all(0),
                 leading: Text("Capital :-",
                     style: TextStyle(
-                        fontSize: 20.sp, fontWeight: FontWeight.bold)),
+                        fontSize: 17.sp, fontWeight: FontWeight.bold)),
                 title: Text('${contrylist.capital.toString()}'),
               ),
               ListTile(
                 contentPadding: EdgeInsets.all(0),
                 leading: Text("Region :-",
                     style: TextStyle(
-                        fontSize: 20.sp, fontWeight: FontWeight.bold)),
+                        fontSize: 17.sp, fontWeight: FontWeight.bold)),
                 title: Text('${contrylist.region.toString()}'),
               ),
               ListTile(
                 contentPadding: EdgeInsets.all(0),
                 leading: Text("Subregion :-",
                     style: TextStyle(
-                        fontSize: 20.sp, fontWeight: FontWeight.bold)),
+                        fontSize: 17.sp, fontWeight: FontWeight.bold)),
                 title: Text('${contrylist.subregion.toString()}'),
               ),
               ListTile(
                 contentPadding: EdgeInsets.all(0),
                 leading: Text("languages :-",
                     style: TextStyle(
-                        fontSize: 20.sp, fontWeight: FontWeight.bold)),
+                        fontSize: 17.sp, fontWeight: FontWeight.bold)),
                 title: Text('${contrylist.languages.ron.toString()}'),
               ),
             ],
