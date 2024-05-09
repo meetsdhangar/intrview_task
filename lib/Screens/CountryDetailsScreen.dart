@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:intrview_task/Screens/HomeScreen.dart';
 
 class CountryDetailsScreen extends StatelessWidget {
   final contrylist;
@@ -13,35 +14,46 @@ class CountryDetailsScreen extends StatelessWidget {
         centerTitle: true,
         title: Text(
           contrylist.name.common,
-          style: TextStyle(fontWeight: FontWeight.w500),
+          style: TextStyle(
+            fontWeight: FontWeight.w500,
+          ),
         ),
       ),
       body: SingleChildScrollView(
         child: Padding(
-          padding: const EdgeInsets.only(
-            left: 10,
-            right: 10,
-          ),
+          padding: const EdgeInsets.only(left: 10, right: 10, top: 10),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Container(
-                child: Image.network(
-                  contrylist.flags.png,
-                  fit: BoxFit.cover,
-                ),
                 height: 200.h,
                 width: MediaQuery.of(context).size.width,
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(15),
+                  color: Colors.amber,
+                  image: DecorationImage(
+                      image: NetworkImage(contrylist.flags.png),
+                      fit: BoxFit.cover),
+                ),
               ),
               SizedBox(
                 height: 15.h,
+              ),
+              Text("Discription :-",
+                  style:
+                      TextStyle(fontSize: 20.sp, fontWeight: FontWeight.bold)),
+              Text(
+                contrylist.flags.alt.toString(),
+                style: TextStyle(fontSize: 17),
               ),
               ListTile(
                 contentPadding: EdgeInsets.all(0),
                 leading: Text("Official :-",
                     style: TextStyle(
                         fontSize: 20.sp, fontWeight: FontWeight.bold)),
-                title: Text(contrylist.name.official),
+                title: Text(
+                  contrylist.name.official,
+                ),
               ),
               ListTile(
                 contentPadding: EdgeInsets.all(0),
@@ -64,17 +76,12 @@ class CountryDetailsScreen extends StatelessWidget {
                         fontSize: 20.sp, fontWeight: FontWeight.bold)),
                 title: Text(contrylist.unMember.toString()),
               ),
-              Text("Currencies",
-                  style: TextStyle(
-                      fontSize: 20.sp,
-                      fontWeight: FontWeight.bold,
-                      fontStyle: FontStyle.italic)),
               ListTile(
                 contentPadding: EdgeInsets.all(0),
-                leading: Text("Name :-",
+                leading: Text("Population :-",
                     style: TextStyle(
                         fontSize: 20.sp, fontWeight: FontWeight.bold)),
-                title: Text(contrylist.name.toString()),
+                title: Text(contrylist.population.toString()),
               ),
               ListTile(
                 contentPadding: EdgeInsets.all(0),

@@ -448,30 +448,6 @@ class Flags {
       };
 }
 
-// class Flags {
-//   String png;
-//   String svg;
-//   String alt;
-
-//   Flags({
-//     required this.png,
-//     required this.svg,
-//     required this.alt,
-//   });
-
-//   factory Flags.fromMap(Map<String, dynamic> json) => Flags(
-//         png: json["png"],
-//         svg: json["svg"],
-//         alt: json["alt"],
-//       );
-
-//   Map<String, dynamic> toMap() => {
-//         "png": png,
-//         "svg": svg,
-//         "alt": alt,
-//       };
-// }
-
 // class Gini {
 //   double the2018;
 
@@ -518,26 +494,6 @@ class Idd {
       };
 }
 
-// class Idd {
-//   String root;
-//   List<String> suffixes;
-
-//   Idd({
-//     required this.root,
-//     required this.suffixes,
-//   });
-
-//   factory Idd.fromMap(Map<String, dynamic> json) => Idd(
-//         root: json["root"],
-//         suffixes: List<String>.from(json["suffixes"].map((x) => x)),
-//       );
-
-//   Map<String, dynamic> toMap() => {
-//         "root": root,
-//         "suffixes": List<dynamic>.from(suffixes.map((x) => x)),
-//       };
-// }
-
 class Languages {
   String? ron; // Make ron field nullable
 
@@ -560,22 +516,6 @@ class Languages {
         "ron": ron,
       };
 }
-
-// class Languages {
-//   String ron;
-
-//   Languages({
-//     required this.ron,
-//   });
-
-//   factory Languages.fromMap(Map<String, dynamic> json) => Languages(
-//         ron: json["ron"],
-//       );
-
-//   Map<String, dynamic> toMap() => {
-//         "ron": ron,
-//       };
-// }
 
 class Maps {
   String googleMaps;
@@ -643,22 +583,6 @@ class NativeName {
             ?.toMap(), // Use the safe navigation operator ?. to access ron's toMap() method
       };
 }
-
-// class NativeName {
-//   Translation ron;
-
-//   NativeName({
-//     required this.ron,
-//   });
-
-//   factory NativeName.fromMap(Map<String, dynamic> json) => NativeName(
-//         ron: Translation.fromMap(json["ron"]),
-//       );
-
-//   Map<String, dynamic> toMap() => {
-//         "ron": ron.toMap(),
-//       };
-// }
 
 class Translation {
   String official;

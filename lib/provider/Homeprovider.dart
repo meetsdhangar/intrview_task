@@ -11,6 +11,13 @@ class Homeprovider with ChangeNotifier {
   bool apierror = false;
   bool servererror = false;
   bool isInternetError = false;
+  int selectedSearch = 1;
+
+  changeSearch(type) {
+    searchlist = [];
+    selectedSearch = type;
+    notifyListeners();
+  }
 
   gethomedata() async {
     isDataLoaded = true; // Set to true when data fetching starts
@@ -51,13 +58,72 @@ class Homeprovider with ChangeNotifier {
     print(list1);
   }
 
-  SearchData(text) {
+  SearchByCountries(text) {
     if (text.isEmpty) {
       searchlist = [];
       notifyListeners();
     } else {
+      searchlist.clear();
+
       searchlist = list1
           .where((element) => element.name.common
+              .toString()
+              .toLowerCase()
+              .startsWith(text.toLowerCase()))
+          .toList();
+      notifyListeners();
+    }
+
+    print(searchlist);
+  }
+
+  SearchBySubregion(text) {
+    if (text.isEmpty) {
+      searchlist = [];
+      notifyListeners();
+    } else {
+      searchlist.clear();
+
+      searchlist = list1
+          .where((element) => element.subregion
+              .toString()
+              .toLowerCase()
+              .startsWith(text.toLowerCase()))
+          .toList();
+      notifyListeners();
+    }
+
+    print(searchlist);
+  }
+
+  SearchByPopulation(text) {
+    if (text.isEmpty) {
+      searchlist = [];
+      notifyListeners();
+    } else {
+      searchlist.clear();
+
+      searchlist = list1
+          .where((element) => element.population
+              .toString()
+              .toLowerCase()
+              .startsWith(text.toLowerCase()))
+          .toList();
+      notifyListeners();
+    }
+
+    print(searchlist);
+  }
+
+  SearchByRegion(text) {
+    if (text.isEmpty) {
+      searchlist = [];
+      notifyListeners();
+    } else {
+      searchlist.clear();
+
+      searchlist = list1
+          .where((element) => element.region
               .toString()
               .toLowerCase()
               .startsWith(text.toLowerCase()))

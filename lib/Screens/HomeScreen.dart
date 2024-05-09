@@ -14,50 +14,15 @@ class HomeScreen extends StatefulWidget {
 }
 
 late Timer _timer;
+int selectedSearch = 1;
 
 class _HomeScreenState extends State<HomeScreen> {
+  Connectivity connectivity = Connectivity();
   @override
   void initState() {
-    context.read<Homeprovider>().getconnectioninfo();
-    Connectivity().onConnectivityChanged.listen((ConnectivityResult result) {
-      // Got a new connectivity status!
-      context.read<Homeprovider>().getconnectioninfo(result: result);
-    });
     context.read<Homeprovider>().gethomedata();
 
     super.initState();
-  }
-
-  Future<bool> checkApiError() async {
-    return context.read<Homeprovider>().apierror;
-  }
-
-  Future<bool> checkInternetError() async {
-    return context.read<Homeprovider>().isInternetError;
-  }
-
-  Future<void> checkApiErrorAndDisplaySnackbar() async {
-    bool isApiError = await checkApiError();
-    bool isServerError = await ServerError();
-    bool isInternetError = await checkInternetError();
-    if (isApiError) {
-      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-        content: Text('Api Response error'),
-        duration: Duration(seconds: 3),
-      ));
-    }
-    if (isServerError) {
-      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-        content: Text('Internal Server error'),
-        duration: Duration(seconds: 3),
-      ));
-    }
-    if (isInternetError) {
-      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-        content: Text('Check your internet connection'),
-        duration: Duration(seconds: 3),
-      ));
-    }
   }
 
   Future<bool> ServerError() async {
@@ -70,16 +35,15 @@ class _HomeScreenState extends State<HomeScreen> {
     super.dispose();
   }
 
+// function to refresh data
+  Future<void> _refreshData() async {
+    await context.read<Homeprovider>().gethomedata();
+  }
+
   @override
   Widget build(BuildContext context) {
     // Fetch data when the widget is first builtconnectivity
     final textcontroller = TextEditingController();
-    //final hp = context.read<Homeprovider>();
-    // hp.gethomedata();
-    // _timer = Timer.periodic(Duration(seconds: 5), (timer) {
-    //   context.read<Homeprovider>().getconnectioninfo(null);
-    //   checkApiErrorAndDisplaySnackbar();
-    // });
 
     return SafeArea(
       child: Scaffold(
@@ -95,383 +59,550 @@ class _HomeScreenState extends State<HomeScreen> {
                 color: Colors.white),
           ),
         ),
-        body: Consumer<Homeprovider>(
-          builder: (context, homeprovider, child) {
-            print(homeprovider.isDataLoaded);
-            if (homeprovider.apierror) {
-              return Center(child: Text('API Error'));
-            } else if (homeprovider.servererror) {
-              return Center(child: Text('Server Error'));
-            } else if (homeprovider.isDataLoaded) {
-              return Center(child: CircularProgressIndicator());
-            } else if (homeprovider.list1.isEmpty) {
-              return Center(child: Text('No data available'));
-            } else {
-              return ListView.builder(
-                itemCount: homeprovider.list1.length,
-                itemBuilder: (context, index) {
-                  var country = homeprovider.list1[index];
-                  return Padding(
-                    padding:
-                        const EdgeInsets.only(left: 10, right: 10, top: 10),
-                    child: Column(
-                      children: [
-                        TextFormField(
-                          controller: textcontroller,
-                          onChanged: (value) {
-                            homeprovider.SearchData(value);
-                          },
-                          showCursor: true,
-                          keyboardType: TextInputType.text,
-                          decoration: InputDecoration(
-                            prefixIcon: Icon(Icons.search),
-                            prefixIconColor: Color(0xFF787474),
-                            contentPadding:
-                                EdgeInsets.only(top: 15, bottom: 15, left: 20),
-                            filled: true,
-                            fillColor: Color(0x30CCCCCC),
-                            hintText: "Search country",
-                            hintStyle: TextStyle(color: Color(0xFF787474)),
-                            enabledBorder: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(13),
-                              borderSide: BorderSide(
-                                  color: Color(0x30CCCCCC), width: 2),
-                            ),
-                            focusedBorder: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(13),
-                              borderSide: BorderSide(
-                                  color: Color(0x30CCCCCC), width: 2),
+        body: StreamBuilder<ConnectivityResult>(
+            stream: connectivity.onConnectivityChanged,
+            builder: (context, snapshot) {
+              return CheckInternetConnectionWidget(
+                  snapshot: snapshot,
+                  widget: Consumer<Homeprovider>(
+                    builder: (context, homeprovider, child) {
+                      var searchdata = homeprovider.searchlist;
+                      var homedata = homeprovider.list1;
+                      print(homeprovider.isDataLoaded);
+                      if (homeprovider.apierror) {
+                        return Center(child: Text('API Error'));
+                      } else if (homeprovider.servererror) {
+                        return Center(child: Text('Server Error'));
+                      } else if (homeprovider.isDataLoaded) {
+                        return Center(child: CircularProgressIndicator());
+                      } else if (homeprovider.list1.isEmpty) {
+                        return Center(child: Text('No data available'));
+                      } else {
+                        return RefreshIndicator(
+                          onRefresh: _refreshData,
+                          child: Padding(
+                            padding: const EdgeInsets.only(
+                                left: 10, right: 10, top: 10),
+                            child: Column(
+                              children: [
+                                TextFormField(
+                                  controller: textcontroller,
+                                  onChanged: (value) {
+                                    if (homeprovider.selectedSearch == 1) {
+                                      homeprovider.SearchByCountries(value);
+                                    } else if (homeprovider.selectedSearch ==
+                                        2) {
+                                      homeprovider.SearchBySubregion(value);
+                                    } else if (homeprovider.selectedSearch ==
+                                        3) {
+                                      homeprovider.SearchByPopulation(value);
+                                    } else if (homeprovider.selectedSearch ==
+                                        4) {
+                                      homeprovider.SearchByRegion(value);
+                                    }
+                                  },
+                                  showCursor: true,
+                                  keyboardType: TextInputType.text,
+                                  decoration: InputDecoration(
+                                    prefixIcon: Icon(Icons.search),
+                                    prefixIconColor: Color(0xFF787474),
+                                    contentPadding: EdgeInsets.only(
+                                        top: 15, bottom: 15, left: 20),
+                                    filled: true,
+                                    fillColor: Color(0x30CCCCCC),
+                                    hintText: homeprovider.selectedSearch == 1
+                                        ? "Search Country"
+                                        : homeprovider.selectedSearch == 2
+                                            ? "Search SubRegion"
+                                            : homeprovider.selectedSearch == 3
+                                                ? "Search Population"
+                                                : "Search Region",
+                                    hintStyle:
+                                        TextStyle(color: Color(0xFF787474)),
+                                    enabledBorder: OutlineInputBorder(
+                                      borderRadius: BorderRadius.circular(13),
+                                      borderSide: BorderSide(
+                                          color: Color(0x30CCCCCC), width: 2),
+                                    ),
+                                    focusedBorder: OutlineInputBorder(
+                                      borderRadius: BorderRadius.circular(13),
+                                      borderSide: BorderSide(
+                                          color: Color(0x30CCCCCC), width: 2),
+                                    ),
+                                  ),
+                                ),
+                                Padding(
+                                  padding: const EdgeInsets.only(top: 10),
+                                  child: Row(
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      InkWell(
+                                        onTap: () {
+                                          textcontroller.text = '';
+                                          homeprovider.changeSearch(1);
+                                        },
+                                        child: Container(
+                                          height: 30.h,
+                                          width: 150.w,
+                                          decoration: BoxDecoration(
+                                              color:
+                                                  homeprovider.selectedSearch ==
+                                                          1
+                                                      ? Colors.green
+                                                      : Color.fromARGB(
+                                                          255, 238, 238, 238),
+                                              borderRadius:
+                                                  BorderRadius.circular(10)),
+                                          child: Center(
+                                            child: Text(" Search Countries",
+                                                style: TextStyle(
+                                                    fontWeight: homeprovider
+                                                                .selectedSearch ==
+                                                            1
+                                                        ? FontWeight.w500
+                                                        : FontWeight.normal,
+                                                    fontSize: 15,
+                                                    color: homeprovider
+                                                                .selectedSearch ==
+                                                            1
+                                                        ? Colors.white
+                                                        : Colors.black)),
+                                          ),
+                                        ),
+                                      ),
+                                      InkWell(
+                                        onTap: () {
+                                          textcontroller.text = '';
+                                          homeprovider.changeSearch(2);
+                                        },
+                                        child: Container(
+                                          height: 30.h,
+                                          width: 150.w,
+                                          decoration: BoxDecoration(
+                                              color:
+                                                  homeprovider.selectedSearch ==
+                                                          2
+                                                      ? Colors.green
+                                                      : Color.fromARGB(
+                                                          255, 238, 238, 238),
+                                              borderRadius:
+                                                  BorderRadius.circular(10)),
+                                          child: Center(
+                                            child: Text("Search Subregion",
+                                                style: TextStyle(
+                                                    fontWeight: homeprovider
+                                                                .selectedSearch ==
+                                                            2
+                                                        ? FontWeight.w500
+                                                        : FontWeight.normal,
+                                                    fontSize: 15,
+                                                    color: homeprovider
+                                                                .selectedSearch ==
+                                                            2
+                                                        ? Colors.white
+                                                        : Colors.black)),
+                                          ),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                                SizedBox(
+                                  height: 10.h,
+                                ),
+                                Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    InkWell(
+                                      onTap: () {
+                                        textcontroller.text = '';
+                                        homeprovider.changeSearch(3);
+                                      },
+                                      child: Container(
+                                        height: 30.h,
+                                        width: 150.w,
+                                        decoration: BoxDecoration(
+                                            color:
+                                                homeprovider.selectedSearch == 3
+                                                    ? Colors.green
+                                                    : Color.fromARGB(
+                                                        255, 238, 238, 238),
+                                            borderRadius:
+                                                BorderRadius.circular(10)),
+                                        child: Center(
+                                          child: Text("Search Population",
+                                              style: TextStyle(
+                                                  fontWeight: homeprovider
+                                                              .selectedSearch ==
+                                                          3
+                                                      ? FontWeight.w500
+                                                      : FontWeight.normal,
+                                                  fontSize: 15.sp,
+                                                  color: homeprovider
+                                                              .selectedSearch ==
+                                                          3
+                                                      ? Colors.white
+                                                      : Colors.black)),
+                                        ),
+                                      ),
+                                    ),
+                                    InkWell(
+                                      onTap: () {
+                                        textcontroller.text = '';
+                                        homeprovider.changeSearch(4);
+                                      },
+                                      child: Container(
+                                        height: 30.h,
+                                        width: 150.w,
+                                        decoration: BoxDecoration(
+                                            color:
+                                                homeprovider.selectedSearch == 4
+                                                    ? Colors.green
+                                                    : Color.fromARGB(
+                                                        255, 238, 238, 238),
+                                            borderRadius:
+                                                BorderRadius.circular(10)),
+                                        child: Center(
+                                          child: Text("Search Region",
+                                              style: TextStyle(
+                                                  fontWeight: homeprovider
+                                                              .selectedSearch ==
+                                                          4
+                                                      ? FontWeight.w500
+                                                      : FontWeight.normal,
+                                                  fontSize: 15.sp,
+                                                  color: homeprovider
+                                                              .selectedSearch ==
+                                                          4
+                                                      ? Colors.white
+                                                      : Colors.black)),
+                                        ),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                                SizedBox(
+                                  height: 10.h,
+                                ),
+                                Expanded(
+                                  child: homeprovider.searchlist.isNotEmpty
+                                      ? ListView.builder(
+                                          itemCount:
+                                              homeprovider.searchlist.length,
+                                          shrinkWrap: true,
+                                          physics:
+                                              NeverScrollableScrollPhysics(),
+                                          itemBuilder: (context, index) {
+                                            return ListTile(
+                                              leading: Container(
+                                                height: 50.h,
+                                                width: 50.w,
+                                                child: Image.network(
+                                                    searchdata[index]
+                                                        .flags
+                                                        .png),
+                                              ),
+                                              subtitle: Column(
+                                                crossAxisAlignment:
+                                                    CrossAxisAlignment.start,
+                                                children: [
+                                                  Text(homeprovider
+                                                              .selectedSearch ==
+                                                          1
+                                                      ? ''
+                                                      : homeprovider
+                                                                  .selectedSearch ==
+                                                              2
+                                                          ? '${searchdata[index].subregion}'
+                                                          : homeprovider
+                                                                      .selectedSearch ==
+                                                                  3
+                                                              ? '${searchdata[index].population}'
+                                                              : '${searchdata[index].region}'),
+                                                ],
+                                              ),
+                                              trailing: TextButton(
+                                                  onPressed: () {
+                                                    Navigator.of(context)
+                                                        .push(MaterialPageRoute(
+                                                      builder: (context) =>
+                                                          CountryDetailsScreen(
+                                                              contrylist:
+                                                                  searchdata[
+                                                                      index]),
+                                                    ));
+                                                  },
+                                                  child: Text(
+                                                    "Country Details",
+                                                    style: TextStyle(
+                                                        fontSize: 15.sp),
+                                                  )),
+                                              title: Text(searchdata[index]
+                                                  .name
+                                                  .common),
+                                            );
+                                          },
+                                        )
+                                      : ListView.builder(
+                                          padding: EdgeInsets.all(0),
+                                          itemCount: homedata.length,
+                                          shrinkWrap: true,
+                                          itemBuilder: (context, index) {
+                                            var mydata = homedata[index];
+
+                                            return ExpansionTile(
+                                              childrenPadding:
+                                                  EdgeInsets.all(0),
+                                              leading: Container(
+                                                height: 50.h,
+                                                width: 50.w,
+                                                child: Image.network(
+                                                    mydata.flags.png),
+                                              ),
+                                              title: Text(
+                                                mydata.name.common,
+                                                style: TextStyle(
+                                                    fontSize: 17.sp,
+                                                    fontWeight:
+                                                        FontWeight.bold),
+                                              ),
+                                              subtitle: Text(
+                                                  mydata.capital.toString()),
+                                              children: [
+                                                Padding(
+                                                  padding:
+                                                      const EdgeInsets.only(
+                                                          bottom: 5),
+                                                  child: Container(
+                                                    decoration: BoxDecoration(
+                                                      gradient: LinearGradient(
+                                                          colors: [
+                                                            Color.fromARGB(146,
+                                                                220, 232, 234),
+                                                            Color.fromARGB(199,
+                                                                126, 243, 163)
+                                                          ]),
+                                                      borderRadius:
+                                                          BorderRadius.circular(
+                                                              10),
+                                                    ),
+                                                    height: 170.h,
+                                                    width:
+                                                        MediaQuery.of(context)
+                                                            .size
+                                                            .width
+                                                            .w,
+                                                    child: Padding(
+                                                      padding:
+                                                          const EdgeInsets.all(
+                                                              10),
+                                                      child: Column(
+                                                        crossAxisAlignment:
+                                                            CrossAxisAlignment
+                                                                .start,
+                                                        children: [
+                                                          Column(
+                                                            children: [
+                                                              Row(
+                                                                children: [
+                                                                  Text(
+                                                                    "Name :-",
+                                                                    style: TextStyle(
+                                                                        fontSize: 15
+                                                                            .sp,
+                                                                        fontWeight:
+                                                                            FontWeight.w500),
+                                                                  ),
+                                                                  Text(
+                                                                    "${mydata.name.common}",
+                                                                    style: TextStyle(
+                                                                        fontSize: 15
+                                                                            .sp,
+                                                                        fontWeight:
+                                                                            FontWeight.w400),
+                                                                  ),
+                                                                ],
+                                                              ),
+                                                              Row(
+                                                                children: [
+                                                                  Text(
+                                                                    "Capital :-",
+                                                                    style: TextStyle(
+                                                                        fontSize: 15
+                                                                            .sp,
+                                                                        fontWeight:
+                                                                            FontWeight.w500),
+                                                                  ),
+                                                                  Text(
+                                                                    "${mydata.capital}",
+                                                                    style: TextStyle(
+                                                                        fontSize: 15
+                                                                            .sp,
+                                                                        fontWeight:
+                                                                            FontWeight.w400),
+                                                                  ),
+                                                                ],
+                                                              ),
+                                                              Row(
+                                                                children: [
+                                                                  Text(
+                                                                    "Population :-",
+                                                                    style: TextStyle(
+                                                                        fontSize: 15
+                                                                            .sp,
+                                                                        fontWeight:
+                                                                            FontWeight.w500),
+                                                                  ),
+                                                                  Text(
+                                                                    "${mydata.population}",
+                                                                    style: TextStyle(
+                                                                        fontSize: 15
+                                                                            .sp,
+                                                                        fontWeight:
+                                                                            FontWeight.w400),
+                                                                  ),
+                                                                ],
+                                                              ),
+                                                            ],
+                                                          ),
+                                                          Row(
+                                                            children: [
+                                                              Text(
+                                                                "Region :-",
+                                                                style: TextStyle(
+                                                                    fontSize:
+                                                                        15.sp,
+                                                                    fontWeight:
+                                                                        FontWeight
+                                                                            .w500),
+                                                              ),
+                                                              Text(
+                                                                "${mydata.region}",
+                                                                style: TextStyle(
+                                                                    fontSize:
+                                                                        15.sp,
+                                                                    fontWeight:
+                                                                        FontWeight
+                                                                            .w400),
+                                                              ),
+                                                            ],
+                                                          ),
+                                                          Row(
+                                                            children: [
+                                                              Text(
+                                                                "Subregion :-",
+                                                                style: TextStyle(
+                                                                    fontSize:
+                                                                        15.sp,
+                                                                    fontWeight:
+                                                                        FontWeight
+                                                                            .w500),
+                                                              ),
+                                                              Text(
+                                                                "${mydata.subregion}",
+                                                                style: TextStyle(
+                                                                    fontSize:
+                                                                        15.sp,
+                                                                    fontWeight:
+                                                                        FontWeight
+                                                                            .w400),
+                                                              ),
+                                                            ],
+                                                          ),
+                                                          SizedBox(
+                                                            height: 10.h,
+                                                          ),
+                                                          InkWell(
+                                                            onTap: () {
+                                                              Navigator.of(
+                                                                      context)
+                                                                  .push(
+                                                                      MaterialPageRoute(
+                                                                builder:
+                                                                    (context) =>
+                                                                        CountryDetailsScreen(
+                                                                  contrylist:
+                                                                      mydata,
+                                                                ),
+                                                              ));
+                                                            },
+                                                            child: Container(
+                                                              decoration:
+                                                                  BoxDecoration(
+                                                                color: Colors
+                                                                    .green,
+                                                                borderRadius:
+                                                                    BorderRadius
+                                                                        .circular(
+                                                                            7.5.r),
+                                                              ),
+                                                              child: Center(
+                                                                child: Padding(
+                                                                  padding:
+                                                                      const EdgeInsets
+                                                                          .all(
+                                                                          5),
+                                                                  child: Text(
+                                                                    "Country Detils",
+                                                                    style: TextStyle(
+                                                                        fontSize: 15
+                                                                            .sp,
+                                                                        fontWeight:
+                                                                            FontWeight
+                                                                                .w500,
+                                                                        color: Colors
+                                                                            .white),
+                                                                  ),
+                                                                ),
+                                                              ),
+                                                            ),
+                                                          )
+                                                        ],
+                                                      ),
+                                                    ),
+                                                  ),
+                                                ),
+                                              ],
+                                            );
+                                          },
+                                        ),
+                                ),
+                              ],
                             ),
                           ),
-                        ),
-                        SizedBox(
-                          height: 10,
-                        ),
-                        Consumer<Homeprovider>(
-                          builder: (context, value, child) {
-                            var searchdata = homeprovider.searchlist;
-                            var homedata = homeprovider.list1;
-                            print(searchdata);
-                            return homeprovider.searchlist.isNotEmpty
-                                ? ListView.builder(
-                                    itemCount: homeprovider.searchlist.length,
-                                    shrinkWrap: true,
-                                    physics: NeverScrollableScrollPhysics(),
-                                    itemBuilder: (context, index) {
-                                      return ListTile(
-                                        leading: Container(
-                                          height: 50.h,
-                                          width: 50.w,
-                                          child: Image.network(
-                                              searchdata[index].flags.png),
-                                        ),
-                                        trailing: TextButton(
-                                            onPressed: () {
-                                              Navigator.of(context)
-                                                  .push(MaterialPageRoute(
-                                                builder: (context) =>
-                                                    CountryDetailsScreen(
-                                                        contrylist:
-                                                            searchdata[index]),
-                                              ));
-                                            },
-                                            child: Text(
-                                              "Country Details",
-                                              style: TextStyle(fontSize: 15.sp),
-                                            )),
-                                        title:
-                                            Text(searchdata[index].name.common),
-                                      );
-                                    },
-                                  )
-                                : ListView.builder(
-                                    padding: EdgeInsets.all(0),
-                                    itemCount: homedata.length,
-                                    shrinkWrap: true,
-                                    itemBuilder: (context, index) {
-                                      var mydata = homedata[index];
-
-                                      return ExpansionTile(
-                                        childrenPadding: EdgeInsets.all(0),
-                                        leading: Container(
-                                          height: 50.h,
-                                          width: 50.w,
-                                          child:
-                                              Image.network(mydata.flags.png),
-                                        ),
-                                        title: Text(
-                                          mydata.name.common,
-                                          style: TextStyle(
-                                              fontSize: 17.sp,
-                                              fontWeight: FontWeight.bold),
-                                        ),
-                                        subtitle:
-                                            Text(mydata.capital.toString()),
-                                        children: [
-                                          Padding(
-                                            padding: const EdgeInsets.all(10),
-                                            child: Container(
-                                              decoration: BoxDecoration(
-                                                border: Border.all(
-                                                    color: Colors.brown),
-                                                borderRadius:
-                                                    BorderRadius.circular(10),
-                                              ),
-                                              height: 200.h,
-                                              width: 300.w,
-                                              child: Padding(
-                                                padding:
-                                                    const EdgeInsets.all(10),
-                                                child: Column(
-                                                  crossAxisAlignment:
-                                                      CrossAxisAlignment.start,
-                                                  children: [
-                                                    Text(
-                                                      "Name :-${mydata.name.common}",
-                                                      style: TextStyle(
-                                                          fontSize: 15.sp,
-                                                          fontWeight:
-                                                              FontWeight.bold),
-                                                    ),
-                                                    Text(
-                                                      "capital :-${mydata.capital}",
-                                                      style: TextStyle(
-                                                          fontSize: 15.sp,
-                                                          fontWeight:
-                                                              FontWeight.bold),
-                                                    ),
-                                                    Text(
-                                                      "population :-${mydata.population}",
-                                                      style: TextStyle(
-                                                          fontSize: 15.sp,
-                                                          fontWeight:
-                                                              FontWeight.bold),
-                                                    ),
-                                                    Text(
-                                                      "region :-${mydata.region}",
-                                                      style: TextStyle(
-                                                          fontSize: 15.sp,
-                                                          fontWeight:
-                                                              FontWeight.bold),
-                                                    ),
-                                                    Text(
-                                                      "subregion :-${mydata.subregion}",
-                                                      style: TextStyle(
-                                                          fontSize: 15.sp,
-                                                          fontWeight:
-                                                              FontWeight.bold),
-                                                    ),
-                                                    SizedBox(
-                                                      height: 10.h,
-                                                    ),
-                                                    InkWell(
-                                                      onTap: () {
-                                                        Navigator.of(context)
-                                                            .push(
-                                                                MaterialPageRoute(
-                                                          builder: (context) =>
-                                                              CountryDetailsScreen(
-                                                            contrylist: mydata,
-                                                          ),
-                                                        ));
-                                                      },
-                                                      child: Center(
-                                                        child: Container(
-                                                          color: Colors.green,
-                                                          height: 50.h,
-                                                          width: 150.w,
-                                                          child: Center(
-                                                            child: Text(
-                                                              "Country Detils",
-                                                              style: TextStyle(
-                                                                  fontSize:
-                                                                      17.sp,
-                                                                  fontWeight:
-                                                                      FontWeight
-                                                                          .w500,
-                                                                  color: Colors
-                                                                      .white),
-                                                            ),
-                                                          ),
-                                                        ),
-                                                      ),
-                                                    )
-                                                  ],
-                                                ),
-                                              ),
-                                            ),
-                                          ),
-                                          // ListTile(
-                                          //   title: Text(mydata.subregion),
-                                          // ),
-                                          // ListTile(
-                                          //   title:
-                                          //       Image.network(mydata.flags.png),
-                                          // ),
-                                          // Add more ListTile widgets or other widgets as needed
-                                        ],
-                                      );
-                                    },
-                                  );
-                          },
-                        )
-                        // : Expanded(
-                        //     child: Consumer<Homeprovider>(
-                        //       builder: (context, homeprovider, child) {
-                        //         // Access the updated list from the provider
-                        //         var homedata = homeprovider.list1;
-
-                        //         return ListView.builder(
-                        //           itemCount: homedata.length,
-                        //           shrinkWrap: true,
-                        //           itemBuilder: (context, index) {
-                        //             var mydata = homedata[index];
-
-                        //             return ExpansionTile(
-                        //               title: Text(mydata.name.common),
-                        //               children: [
-                        //                 ListTile(
-                        //                   title: Text(mydata.subregion),
-                        //                 ),
-                        //                 ListTile(
-                        //                   title: Image.network(mydata.flags.png),
-                        //                 ),
-                        //                 // Add more ListTile widgets or other widgets as needed
-                        //               ],
-                        //             );
-                        //           },
-                        //         );
-                        //       },
-                        //     ),
-                        //   )
-                      ],
-                    ),
-                  );
-                },
-              );
-            }
-
-            // return homeprovider.isDataLoaded == true
-            //     ? Center(
-            //         child: CircularProgressIndicator(),
-            //       )
-            //     : homeprovider.list1.isEmpty
-            //         ? Center(child: Text('No data'))
-            //         : Padding(
-            //             padding: const EdgeInsets.only(left: 10, right: 10),
-            //             child: Column(
-            //               children: [
-            //                 TextFormField(
-            //                   controller: textcontroller,
-            //                   onChanged: (value) {
-            //                     homeprovider.SearchData(value);
-            //                   },
-            //                   showCursor: true,
-            //                   keyboardType: TextInputType.text,
-            //                   decoration: InputDecoration(
-            //                     suffixIcon: Icon(Icons.search),
-            //                     prefixIconColor: Color(0xFF787474),
-            //                     contentPadding: EdgeInsets.only(
-            //                         top: 15, bottom: 15, left: 20),
-            //                     filled: true,
-            //                     fillColor: Color(0x30CCCCCC),
-            //                     hintText: "Search",
-            //                     hintStyle: TextStyle(color: Color(0xFF787474)),
-            //                     enabledBorder: OutlineInputBorder(
-            //                       borderRadius: BorderRadius.circular(13),
-            //                       borderSide: BorderSide(
-            //                           color: Color(0x30CCCCCC), width: 2),
-            //                     ),
-            //                     focusedBorder: OutlineInputBorder(
-            //                       borderRadius: BorderRadius.circular(13),
-            //                       borderSide: BorderSide(
-            //                           color: Color(0x30CCCCCC), width: 2),
-            //                     ),
-            //                   ),
-            //                 ),
-            //                 SizedBox(
-            //                   height: 10,
-            //                 ),
-            //                 Consumer<Homeprovider>(
-            //                   builder: (context, value, child) {
-            //                     var searchdata = homeprovider.searchlist;
-            //                     var homedata = homeprovider.list1;
-            //                     print(searchdata);
-            //                     return Expanded(
-            //                         child: homeprovider.searchlist.isNotEmpty
-            //                             ? ListView.builder(
-            //                                 itemCount:
-            //                                     homeprovider.searchlist.length,
-            //                                 shrinkWrap: true,
-            //                                 physics:
-            //                                     NeverScrollableScrollPhysics(),
-            //                                 itemBuilder: (context, index) {
-            //                                   return ListTile(
-            //                                     title: Text(searchdata[index]
-            //                                         .name
-            //                                         .common),
-            //                                   );
-            //                                 },
-            //                               )
-            //                             : ListView.builder(
-            //                                 itemCount: homedata.length,
-            //                                 shrinkWrap: true,
-            //                                 itemBuilder: (context, index) {
-            //                                   var mydata = homedata[index];
-
-            //                                   return ExpansionTile(
-            //                                     title: Text(mydata.name.common),
-            //                                     children: [
-            //                                       ListTile(
-            //                                         title:
-            //                                             Text(mydata.subregion),
-            //                                       ),
-            //                                       ListTile(
-            //                                         title: Image.network(
-            //                                             mydata.flags.png),
-            //                                       ),
-            //                                       // Add more ListTile widgets or other widgets as needed
-            //                                     ],
-            //                                   );
-            //                                 },
-            //                               ));
-            //                   },
-            //                 )
-            //                 // : Expanded(
-            //                 //     child: Consumer<Homeprovider>(
-            //                 //       builder: (context, homeprovider, child) {
-            //                 //         // Access the updated list from the provider
-            //                 //         var homedata = homeprovider.list1;
-
-            //                 //         return ListView.builder(
-            //                 //           itemCount: homedata.length,
-            //                 //           shrinkWrap: true,
-            //                 //           itemBuilder: (context, index) {
-            //                 //             var mydata = homedata[index];
-
-            //                 //             return ExpansionTile(
-            //                 //               title: Text(mydata.name.common),
-            //                 //               children: [
-            //                 //                 ListTile(
-            //                 //                   title: Text(mydata.subregion),
-            //                 //                 ),
-            //                 //                 ListTile(
-            //                 //                   title: Image.network(mydata.flags.png),
-            //                 //                 ),
-            //                 //                 // Add more ListTile widgets or other widgets as needed
-            //                 //               ],
-            //                 //             );
-            //                 //           },
-            //                 //         );
-            //                 //       },
-            //                 //     ),
-            //                 //   )
-            //               ],
-            //             ),
-            //           );
-          },
-        ),
+                        );
+                      }
+                    },
+                  ));
+            }),
       ),
     );
+  }
+}
+
+class CheckInternetConnectionWidget extends StatelessWidget {
+  final AsyncSnapshot<ConnectivityResult> snapshot;
+  final Widget widget;
+  const CheckInternetConnectionWidget(
+      {Key? key, required this.snapshot, required this.widget})
+      : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    switch (snapshot.connectionState) {
+      case ConnectionState.active:
+        final state = snapshot.data!;
+        switch (state) {
+          case ConnectivityResult.none:
+            return Center(child: const Text('Not connected'));
+          default:
+            return widget;
+        }
+
+      default:
+        return const Text('eror');
+    }
   }
 }
