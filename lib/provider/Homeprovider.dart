@@ -14,14 +14,14 @@ class Homeprovider with ChangeNotifier {
 
   gethomedata() async {
     isDataLoaded = true; // Set to true when data fetching starts
-    notifyListeners();
+    // notifyListeners();
 
     try {
       var url = 'https://restcountries.com/v3.1/all';
       var response = await http.get(Uri.parse(url));
 
       if (response.statusCode == 200) {
-        print(response.body); // Print the response body
+        print(response.body); //print response
         var data = jsonDecode(response.body);
 
         list1.clear(); // Clear the list before adding new data
@@ -75,7 +75,7 @@ class Homeprovider with ChangeNotifier {
     } else {
       connectivityResult = result;
     }
-    
+
     //var connectivityResult = await (Connectivity().checkConnectivity());
     if (connectivityResult == ConnectivityResult.mobile) {
       isInternetError = false;
