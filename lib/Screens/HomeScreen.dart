@@ -611,6 +611,7 @@ class CheckInternetConnectionWidget extends StatelessWidget {
                   const Text(
                     'No Internet Connection',
                     style: TextStyle(fontSize: 17),
+                    //
                   ),
                 ],
               ),
