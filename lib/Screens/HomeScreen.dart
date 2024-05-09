@@ -70,13 +70,13 @@ class _HomeScreenState extends State<HomeScreen> {
                       var homedata = homeprovider.list1;
                       print(homeprovider.isDataLoaded);
                       if (homeprovider.apierror) {
-                        return Center(child: Text('API Error'));
+                        return const Center(child: Text('API Error'));
                       } else if (homeprovider.servererror) {
-                        return Center(child: Text('Server Error'));
+                        return const Center(child: Text('Server Error'));
                       } else if (homeprovider.isDataLoaded) {
-                        return Center(child: CircularProgressIndicator());
+                        return const Center(child: CircularProgressIndicator());
                       } else if (homeprovider.list1.isEmpty) {
-                        return Center(child: Text('No data available'));
+                        return const Center(child: Text('No data available'));
                       } else {
                         return RefreshIndicator(
                           onRefresh: _refreshData,
@@ -104,12 +104,12 @@ class _HomeScreenState extends State<HomeScreen> {
                                   showCursor: true,
                                   keyboardType: TextInputType.text,
                                   decoration: InputDecoration(
-                                    prefixIcon: Icon(Icons.search),
-                                    prefixIconColor: Color(0xFF787474),
-                                    contentPadding: EdgeInsets.only(
+                                    prefixIcon: const Icon(Icons.search),
+                                    prefixIconColor: const Color(0xFF787474),
+                                    contentPadding: const EdgeInsets.only(
                                         top: 15, bottom: 15, left: 20),
                                     filled: true,
-                                    fillColor: Color(0x30CCCCCC),
+                                    fillColor: const Color(0x30CCCCCC),
                                     hintText: homeprovider.selectedSearch == 1
                                         ? "Search Country"
                                         : homeprovider.selectedSearch == 2
@@ -121,12 +121,12 @@ class _HomeScreenState extends State<HomeScreen> {
                                         TextStyle(color: Color(0xFF787474)),
                                     enabledBorder: OutlineInputBorder(
                                       borderRadius: BorderRadius.circular(13),
-                                      borderSide: BorderSide(
+                                      borderSide: const BorderSide(
                                           color: Color(0x30CCCCCC), width: 2),
                                     ),
                                     focusedBorder: OutlineInputBorder(
                                       borderRadius: BorderRadius.circular(13),
-                                      borderSide: BorderSide(
+                                      borderSide: const BorderSide(
                                           color: Color(0x30CCCCCC), width: 2),
                                     ),
                                   ),
@@ -354,7 +354,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
                                             return ExpansionTile(
                                               childrenPadding:
-                                                  EdgeInsets.all(0),
+                                                  const EdgeInsets.all(0),
                                               leading: Container(
                                                 height: 50.h,
                                                 width: 50.w,
@@ -377,8 +377,9 @@ class _HomeScreenState extends State<HomeScreen> {
                                                           bottom: 5),
                                                   child: Container(
                                                     decoration: BoxDecoration(
-                                                      gradient: LinearGradient(
-                                                          colors: [
+                                                      gradient:
+                                                          const LinearGradient(
+                                                              colors: [
                                                             Color.fromARGB(146,
                                                                 220, 232, 234),
                                                             Color.fromARGB(199,
