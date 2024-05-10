@@ -335,7 +335,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                                     ));
                                                   },
                                                   child: Text(
-                                                    "Country Details",
+                                                    " Details",
                                                     style: TextStyle(
                                                         fontSize: 15.sp),
                                                   )),
